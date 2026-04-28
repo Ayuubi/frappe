@@ -16,7 +16,21 @@ export default class Tab {
 
 	make() {
 		const id = `${frappe.scrub(this.doctype, "-")}-${this.df.fieldname}`;
-		this.parent = $(`
+		// alert(this.label)
+		if(this.label === "New Details"){
+			this.parent = $(`
+			<li class="nav-item">
+				<a class="nav-link ${this.df.active ? "active" : ""}" id="${id}-tab"
+					
+			
+					>
+						
+				</a>
+			</li>
+		`).appendTo(this.tabs_list);
+		}
+		else{
+			this.parent = $(`
 			<li class="nav-item">
 				<a class="nav-link ${this.df.active ? "active" : ""}" id="${id}-tab"
 					data-toggle="tab"
@@ -27,6 +41,9 @@ export default class Tab {
 				</a>
 			</li>
 		`).appendTo(this.tabs_list);
+
+		}
+		
 
 		this.wrapper = $(`<div class="tab-pane fade show ${this.df.active ? "active" : ""}"
 			id="${id}" role="tabpanel" aria-labelledby="${id}-tab">`).appendTo(this.tabs_content);
@@ -48,8 +65,8 @@ export default class Tab {
 			hide = true;
 		}
 
-		if (!hide) {
-			// show only if there is at least one visible section or control
+		if (!hide && !this.df.show_dashboard) {
+			// show only if there is at least one visibe section or control
 			hide = true;
 			if (
 				this.wrapper.find(
@@ -81,7 +98,7 @@ export default class Tab {
 
 	set_active() {
 		this.parent.find(".nav-link").tab("show");
-		this.wrapper.addClass("show");
+		this.wrapper.addClass("active");
 		this.frm?.set_active_tab?.(this);
 	}
 

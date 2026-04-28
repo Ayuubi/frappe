@@ -129,7 +129,8 @@
    "fieldtype": "Data",
    "label": "Middle Name",
    "oldfieldname": "middle_name",
-   "oldfieldtype": "Data"
+   "oldfieldtype": "Data",
+   "set_only_once": 1
   },
   {
    "bold": 1,
@@ -137,19 +138,19 @@
    "fieldtype": "Data",
    "label": "Last Name",
    "oldfieldname": "last_name",
-   "oldfieldtype": "Data"
+   "oldfieldtype": "Data",
+   "set_only_once": 1
   },
   {
    "fieldname": "full_name",
    "fieldtype": "Data",
    "in_global_search": 1,
    "in_standard_filter": 1,
-   "label": "Full Name",
-   "read_only": 1
+   "label": "Full Name"
   },
   {
    "bold": 1,
-   "default": "1",
+   "default": "0",
    "depends_on": "eval:doc.__islocal",
    "fieldname": "send_welcome_email",
    "fieldtype": "Check",
@@ -176,6 +177,7 @@
    "in_global_search": 1,
    "in_standard_filter": 1,
    "label": "Username",
+   "read_only": 1,
    "unique": 1
   },
   {
@@ -215,6 +217,7 @@
    "permlevel": 1
   },
   {
+   "depends_on": "eval: in_list(frappe.user_roles, 'System Manager')",
    "fieldname": "roles_html",
    "fieldtype": "HTML",
    "label": "Roles HTML",
@@ -617,13 +620,13 @@
    "options": "Module Profile"
   },
   {
-    "description": "Stores the datetime when the last reset password key was generated.",
-    "fieldname": "last_reset_password_key_generated_on",
-    "fieldtype": "Datetime",
-    "hidden": 1,
-    "label": "Last Reset Password Key Generated On",
-    "read_only": 1
-   },
+   "description": "Stores the datetime when the last reset password key was generated.",
+   "fieldname": "last_reset_password_key_generated_on",
+   "fieldtype": "Datetime",
+   "hidden": 1,
+   "label": "Last Reset Password Key Generated On",
+   "read_only": 1
+  },
   {
    "fieldname": "column_break_75",
    "fieldtype": "Column Break"
@@ -650,12 +653,12 @@
    "label": "Auto follow documents that you Like"
   },
   {
-    "default": "0",
-    "depends_on": "eval:(doc.document_follow_notify== 1)",
-    "fieldname": "follow_shared_documents",
-    "fieldtype": "Check",
-    "label": "Auto follow documents that are shared with you"
-   },
+   "default": "0",
+   "depends_on": "eval:(doc.document_follow_notify== 1)",
+   "fieldname": "follow_shared_documents",
+   "fieldtype": "Check",
+   "label": "Auto follow documents that are shared with you"
+  },
   {
    "default": "0",
    "depends_on": "eval:(doc.document_follow_notify== 1)",
@@ -731,7 +734,7 @@
    "link_fieldname": "user"
   }
  ],
- "modified": "2023-06-05 17:26:04.127555",
+ "modified": "2026-02-19 12:07:20.261422",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",
@@ -760,6 +763,18 @@
   {
    "role": "All",
    "select": 1
+  },
+  {
+   "create": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "Support Team",
+   "select": 1,
+   "share": 1,
+   "write": 1
   }
  ],
  "quick_entry": 1,

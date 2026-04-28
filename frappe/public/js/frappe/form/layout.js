@@ -36,16 +36,34 @@ frappe.ui.form.Layout = class Layout {
 	}
 
 	setup_tabbed_layout() {
+
+		$(`<div class="details">
+		
+		</div>`).prependTo(this.page);
 		$(`
+		
 			<div class="form-tabs-list">
 				<ul class="nav form-tabs" id="form-tabs" role="tablist"></ul>
 			</div>
 		`).appendTo(this.page);
 		this.tabs_list = this.page.find(".form-tabs");
+		this.details = $(".details");
+		this.detail_content = $(`<div></div>`).prependTo(this.page);
 		this.tabs_content = $(`<div class="form-tab-content tab-content"></div>`).appendTo(
 			this.page
 		);
 		this.setup_events();
+	}
+
+	show_empty_form_message() {
+		if (
+			!(
+				this.wrapper.find(".frappe-control:visible").length ||
+				this.wrapper.find(".section-head.collapsed").length
+			)
+		) {
+			this.show_message(__("This form does not have any input"));
+		}
 	}
 
 	get_doctype_fields() {
@@ -114,10 +132,12 @@ frappe.ui.form.Layout = class Layout {
 
 	render(new_fields) {
 		let fields = new_fields || this.fields;
+		// console.log(fields)
 
 		this.section = null;
 		this.column = null;
-
+		// console.log(indexOfObject); // 👉️ 1
+		// fields.splice(1, 1);
 		if (this.no_opening_section() && !this.is_tabbed_layout()) {
 			this.fields.unshift({ fieldtype: "Section Break" });
 		}
@@ -125,28 +145,21 @@ frappe.ui.form.Layout = class Layout {
 		if (this.is_tabbed_layout()) {
 			// add a tab without `fieldname` to avoid conflicts
 			let default_tab = {
-				label: __("Details"),
+				label: __("New Details"),
 				fieldtype: "Tab Break",
 				fieldname: "__details",
 			};
-
-			let first_field_visible = this.fields.find((element) => element.hidden == false);
-			let first_tab =
-				first_field_visible?.fieldtype === "Tab Break" ? first_field_visible : null;
-
+			let first_tab = this.fields[1].fieldtype === "Tab Break" ? this.fields[1] : null;
 			if (!first_tab) {
-				this.fields.splice(0, 0, default_tab);
-			} else {
-				// reshuffle __newname field to accomodate under 1st Tab Break
-				let newname_field = this.fields.find((df) => df.fieldname === "__newname");
-				if (newname_field && newname_field.get_status(this) === "Write") {
-					this.fields.splice(0, 1);
-					this.fields.splice(1, 0, newname_field);
-				}
+				this.fields.splice(1, 0, default_tab);
 			}
 		}
-
-		fields.forEach((df) => {
+		// const indexOfObject =fields[1]
+		  
+		
+		  
+	
+		fields.forEach((df , index) => {
 			switch (df.fieldtype) {
 				case "Fold":
 					this.make_page(df);
@@ -162,7 +175,7 @@ frappe.ui.form.Layout = class Layout {
 					this.make_column(df);
 					break;
 				case "Tab Break":
-					this.make_tab(df);
+					this.make_tab(df ,index);
 					break;
 				default:
 					this.make_field(df);
@@ -209,7 +222,7 @@ frappe.ui.form.Layout = class Layout {
 		this.section.fields_dict[df.fieldname] = fieldobj;
 		fieldobj.section = this.section;
 
-		if (this.current_tab) {
+		if (this.current_tab &  this.current_tab !== "Details") {
 			fieldobj.tab = this.current_tab;
 			this.current_tab.fields_list.push(fieldobj);
 			this.current_tab.fields_dict[df.fieldname] = fieldobj;
@@ -228,6 +241,7 @@ frappe.ui.form.Layout = class Layout {
 		});
 
 		fieldobj.layout = this;
+		// console.log(fieldobj)
 		return fieldobj;
 	}
 
@@ -237,14 +251,14 @@ frappe.ui.form.Layout = class Layout {
 
 	make_page(df) {
 		// eslint-disable-line no-unused-vars
-		let me = this;
-		let head = $(`
-			<div class="form-clickable-section text-center">
-				<a class="btn-fold h6 text-muted">
-					${__("Show more details")}
-				</a>
-			</div>
-		`).appendTo(this.wrapper);
+		let me = this,
+			head = $(
+				'<div class="form-clickable-section text-center">\
+				<a class="btn-fold h6 text-muted">' +
+					__("Show more details") +
+					"</a>\
+			</div>"
+			).appendTo(this.wrapper);
 
 		this.page = $('<div class="form-page second-page hide"></div>').appendTo(this.wrapper);
 
@@ -294,13 +308,30 @@ frappe.ui.form.Layout = class Layout {
 		}
 	}
 
-	make_tab(df) {
+	make_tab(df , index ) {
+		// alert(df.label + index)
 		this.section = null;
-		let tab = new Tab(this, df, this.frm, this.tabs_list, this.tabs_content);
-		this.current_tab = tab;
-		this.make_section({ fieldtype: "Section Break" });
+		var tab = {}
+		if (index == 1){
+		
+			tab = new Tab(this, df, this.frm, this.details, this.detail_content);
+			// this.make_section({ fieldtype: "Section Break" });
+		
+		}
+		else{
+			tab = new Tab(this, df, this.frm, this.tabs_list, this.tabs_content);
+			this.make_section({ fieldtype: "Section Break" });
+		
+			
+		}
 		this.tabs.push(tab);
+		this.current_tab = tab;
+
+   
+   
+		// console.log(tab)
 		return tab;
+		
 	}
 
 	refresh(doc) {
@@ -375,7 +406,7 @@ frappe.ui.form.Layout = class Layout {
 			frm_active_tab.set_active();
 		} else if (this.tabs.length) {
 			// set first tab as active when opening for first time, or new doc
-			let first_visible_tab = this.tabs.find((tab) => !tab.is_hidden());
+			let first_visible_tab = this.tabs[1];
 			first_visible_tab && first_visible_tab.set_active();
 		}
 	}
@@ -445,37 +476,10 @@ frappe.ui.form.Layout = class Layout {
 	}
 
 	setup_events() {
-		let last_scroll = 0;
-		let tabs_list = $(".form-tabs-list");
-		let tabs_content = this.tabs_content[0];
-		if (!tabs_list.length) return;
-
-		$(window).scroll(
-			frappe.utils.throttle(() => {
-				let current_scroll = document.documentElement.scrollTop;
-				if (current_scroll > 0 && last_scroll <= current_scroll) {
-					tabs_list.removeClass("form-tabs-sticky-down");
-					tabs_list.addClass("form-tabs-sticky-up");
-				} else {
-					tabs_list.removeClass("form-tabs-sticky-up");
-					tabs_list.addClass("form-tabs-sticky-down");
-				}
-				last_scroll = current_scroll;
-			}, 500)
-		);
-
 		this.tabs_list.off("click").on("click", ".nav-link", (e) => {
 			e.preventDefault();
 			e.stopImmediatePropagation();
 			$(e.currentTarget).tab("show");
-			if (tabs_content.getBoundingClientRect().top < 100) {
-				tabs_content.scrollIntoView();
-				setTimeout(() => {
-					$(".page-head").css("top", "-15px");
-					$(".form-tabs-list").removeClass("form-tabs-sticky-down");
-					$(".form-tabs-list").addClass("form-tabs-sticky-up");
-				}, 3);
-			}
 		});
 	}
 

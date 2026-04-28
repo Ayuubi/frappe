@@ -9,6 +9,7 @@ from frappe.utils import get_fullname
 
 
 def update_feed(doc, method=None):
+	return
 	if frappe.flags.in_patch or frappe.flags.in_install or frappe.flags.in_import:
 		return
 
@@ -62,6 +63,7 @@ def logout_feed(user, reason):
 
 
 def get_feed_match_conditions(user=None, doctype="Comment"):
+	return
 	if not user:
 		user = frappe.session.user
 
