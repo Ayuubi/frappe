@@ -212,6 +212,8 @@
    "allow_in_quick_entry": 1,
    "fieldname": "role_profile_name",
    "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Role Profile",
    "options": "Role Profile",
    "permlevel": 1
@@ -734,7 +736,7 @@
    "link_fieldname": "user"
   }
  ],
- "modified": "2026-02-19 12:07:20.261422",
+ "modified": "2026-05-04 17:06:09.275516",
  "modified_by": "Administrator",
  "module": "Core",
  "name": "User",
